@@ -80,11 +80,7 @@ export class QuizService {
     }
     const result = {
       quizId: obj._id.toString(),
-      question: obj.content.question,
-      A: obj.content.A,
-      B: obj.content.B,
-      C: obj.content.C,
-      D: obj.content.D,
+      question: obj.content,
     };
     return result;
   }

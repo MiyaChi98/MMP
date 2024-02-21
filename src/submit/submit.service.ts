@@ -3,24 +3,22 @@ import { SubmitDto } from "../dto/submit.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Submit } from "src/schema/submit.schema";
 import { Model } from "mongoose";
-import { ExamService } from "src/exam/exam.service";
 import { QuizService } from "src/quiz/quiz.service";
 import { Role } from "src/constant/roleEnum";
+import { Exam } from "src/schema/exam.schema";
 
 @Injectable()
 export class SubmitService {
   constructor(
     @InjectModel(Submit.name) private SubmitModel: Model<Submit>,
-    private readonly examService: ExamService,
+    @InjectModel(Exam.name) private ExamModel: Model<Exam>,
     private readonly quizService: QuizService,
   ) {}
   // Create course
   async create(submitDto: SubmitDto, userId: string) {
-    const exam = await this.examService.findOne(submitDto.examId);
+    const exam = await this.ExamModel.findById(submitDto.examId);
     if (!exam) throw new BadRequestException("There is no exam like that!");
-    const examQuizzes = await this.quizService.findbyExam(
-      exam.examId.toString(),
-    );
+    const examQuizzes = await this.quizService.findbyExam(submitDto.examId);
     const examQuizzesId = [];
     for (const quiz of examQuizzes) {
       examQuizzesId.push(quiz.quizId);
@@ -36,11 +34,21 @@ export class SubmitService {
       throw new BadRequestException(
         `The quiz you submit doesn't contain in this exam`,
       );
+    let mark = 0;
+    const listAnswer = submitDto?.submitAnswer?.array;
+    if (listAnswer?.length > 0)
+      for (const submitQuiz of listAnswer) {
+        const quizzfindOne = await this.quizService.findOne(submitQuiz.quizId);
+        const answer = quizzfindOne?.question?.answer;
+        if (answer == submitQuiz.answer) {
+          mark++;
+        }
+      }
     const createdSubmit = await this.SubmitModel.create({
       examId: submitDto.examId,
       studentId: userId,
       submitAnswer: submitDto.submitAnswer,
-      mark: 10,
+      mark: (mark / examQuizzes.length) * exam.total_mark,
     });
     return createdSubmit;
   }
@@ -62,6 +70,7 @@ export class SubmitService {
     const result = {
       examId: submit.examId,
       studentId: submit.studentId,
+      mark: submit.mark,
       studentAnswer: allQuiz,
     };
     return result;

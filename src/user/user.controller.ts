@@ -42,7 +42,7 @@ export class UserController {
   })
   @ApiOkResponse(UserXXX.successFindAll)
   async getAllUser(@Query() pagination: PaginationDto) {
-    const page = parseInt(pagination.page as any) || 0;
+    const page = parseInt(pagination.page as any) || 1;
     const limit = parseInt(pagination.limit as any) || 5;
     const user = await this.userService.findAll(page, limit);
     return user;
@@ -85,7 +85,7 @@ export class UserController {
   @ApiCreatedResponse(UserXXX.successCreatedUser)
   @UsePipes(new ValidationPipe())
   async createStudent(@Body() userDetails: CreateUserDto) {
-    this.userService.create(userDetails);
+    return await this.userService.create(userDetails);
   }
   //Update one by ID
   @Patch(":id")

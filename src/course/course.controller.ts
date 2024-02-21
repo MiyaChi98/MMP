@@ -9,6 +9,7 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Query,
 } from "@nestjs/common";
 import { CourseService } from "./course.service";
 import { CreateCourseDto } from "../dto/createCourse.dto";
@@ -26,6 +27,7 @@ import { RolesGuard } from "src/guard/role.guard";
 import { ATGuard } from "src/guard/accessToken.guards";
 import { CourseXXX } from "./constant/CourseXXX";
 import { IdValidationPipe } from "src/pipes/IDvalidation.pipe";
+import { PaginationDto } from "src/dto/pagination.dto";
 @ApiTags("Course")
 @HasRoles(Role.TEACHER, Role.ADMIN)
 @UseGuards(ATGuard, RolesGuard)
@@ -49,8 +51,10 @@ export class CourseController {
     summary: "Use to find all course",
   })
   @ApiOkResponse(CourseXXX.successFindAllCourse)
-  async findAll() {
-    return await this.courseService.findAll();
+  async findAll(@Query() pagination: PaginationDto) {
+    const page = parseInt(pagination.page as any) || 1;
+    const limit = parseInt(pagination.limit as any) || 5;
+    return await this.courseService.findAll(page, limit);
   }
 
   @Get(":id")

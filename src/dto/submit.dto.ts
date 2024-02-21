@@ -22,7 +22,7 @@ export class AnswerArray {
 }
 
 export class SubmitDto {
-  @ApiProperty({ example: "" })
+  @ApiProperty({ example: "658c5327442021afa622b1e7" })
   @IsString()
   @IsNotEmpty()
   examId: string;

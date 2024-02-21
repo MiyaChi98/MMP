@@ -13,7 +13,9 @@ export class User {
   phone: string;
   @Prop()
   zone: Role[];
-  @Prop({ select: false })
+  @Prop()
+  gender: "female" | "male";
+  @Prop()
   refreshToken: string;
 }
 

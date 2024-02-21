@@ -29,6 +29,10 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
+  app.enableCors({
+    allowedHeaders: "*",
+    origin: "*",
+  });
   // app.useStaticAssets(join(__dirname, "..", "uploads"), {
   //   prefix: "/uploads/",
   // });

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: mongo
+    container_name: nestjs_db
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    # volumes:
+    #   - ./docker/volumes/mmp-db
+  dev:
+    container_name: nestjs_api_dev
+    image: nestjs-api-dev:1.0.0
+    build:
+      context: .
+      target: development
+      dockerfile: ./Dockerfile
+    command: npm run start:dev
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped

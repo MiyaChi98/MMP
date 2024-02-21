@@ -7,6 +7,7 @@ import { Exam } from "src/schema/exam.schema";
 import { UserService } from "src/user/user.service";
 import { QuizService } from "src/quiz/quiz.service";
 import { UpdateExamDTO } from "src/dto/updateExam.dto";
+import { Submit } from "src/schema/submit.schema";
 @Injectable()
 export class ExamService {
   constructor(
@@ -14,6 +15,7 @@ export class ExamService {
     private readonly courseService: CourseService,
     private readonly quizService: QuizService,
     @InjectModel(Exam.name) private ExamModel: Model<Exam>,
+    @InjectModel(Submit.name) private SubmitModel: Model<Submit>,
   ) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async examIdentify(userID: string, courseId: string) {
@@ -86,7 +88,8 @@ export class ExamService {
     return await this.findOne(id);
   }
   async delete(id: string) {
-    await this.ExamModel.deleteOne({ examId: id });
-    return "Delete exam success";
+    await this.ExamModel.findByIdAndDelete(id);
+    await this.SubmitModel.deleteMany({ examId: id });
+    return "Delete success";
   }
 }

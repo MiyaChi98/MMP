@@ -10,11 +10,15 @@ import * as bcrypt from "bcrypt";
 import { AuthDto } from "src/dto/auth.dto";
 import { Role } from "src/constant/roleEnum";
 import { Register } from "src/dto/register.dto";
+import { InjectModel } from "@nestjs/mongoose";
+import { User } from "src/schema/user.schema";
+import { Model } from "mongoose";
 
 @Injectable()
 export class AuthService {
   //Take in jwt and UserService that imported from User module
   constructor(
+    @InjectModel(User.name) private UserModel: Model<User>,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
@@ -79,10 +83,15 @@ export class AuthService {
   }
   //Get new access token
   async getnewAccessToken(userId: string, rt: string) {
-    const user = await this.userService.findOnebyID(userId);
-    console.log(user, user.refreshToken);
-    if (!user || !user.refreshToken)
+    const user = await this.UserModel.findOne(
+      { _id: userId },
+      {
+        password: 0,
+      },
+    );
+    if (!user || !user.refreshToken) {
       throw new ForbiddenException("Access Denied");
+    }
     if (user.refreshToken === rt) {
       const tokens: any = await this.getTokens(user._id.toString(), user.zone);
       const userDetail = {

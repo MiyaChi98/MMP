@@ -30,7 +30,7 @@ import { LogsModule } from "./logs/logs.module";
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "uploads"),
     }),
-    MongooseModule.forRoot("mongodb://localhost:27017", { dbName: "Custom" }),
+    MongooseModule.forRoot("mongodb://127.0.0.1:27017", { dbName: "Custom" }),
     UserModule,
     AuthModule,
     EmailModule,
